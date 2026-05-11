@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <string>
 using namespace std;
 
 class User {
@@ -16,6 +17,10 @@ public:
         generateId();
     }   
 
+    ~User() {
+        cout << "User \"" << nama << "\" dihapus\n";
+    }
+
     void generateId();
 
 };
@@ -31,6 +36,10 @@ public:
         status = true;
     }
 
+    ~Member() {
+        cout << "Member \"" << nama << "\" dihapus\n";
+    }
+
     void showProfile();
 
     void toggleStatus();
@@ -42,11 +51,15 @@ public:
 
 class Admin : public User {
 public:
-    Admin(string nama, string email) : User(nama, email) {}
+    Admin(string nama, string email) : User(nama, email){}
 
-    void showAllMember(vector<Member> &members);
+    ~Admin() {
+        cout << "Admin \"" << nama << "\" dihapus\n";
+    }
 
-    void toggleActivationMember(Member &m);
+    void showAllMember(vector<Member*> &members);
+
+    void toggleActivationMember(Member *m);
 };
 
 void User::generateId() {
@@ -72,41 +85,46 @@ bool Member::getStatus() {
     return status;
 }
 
-void Admin::showAllMember(vector<Member> &members) {
+void Admin::showAllMember(vector<Member*> &members) {
     cout << "\n=== DAFTAR MEMBER ===\n";
 
     for (int i = 0; i < members.size(); i++) {
         cout << i + 1 << ". "
-             << members[i].getNama()
+             << members[i]->getNama()
              << " - "
-             << (members[i].getStatus() ? "Aktif" : "Nonaktif")
+             << (members[i]->getStatus() ? "Aktif" : "Nonaktif")
              << endl;
     }
 }
 
-void Admin::toggleActivationMember(Member &m) {
-    m.toggleStatus();
+void Admin::toggleActivationMember(Member *m) {
+    m->toggleStatus();
 }
 
 int main() {
 
-    Member member1("Maritza", "maritza@gmail.com");
-    Member member2("Fidelya", "fidelya@gmail.com");
+    Member *member1 = new Member("Maritza", "maritza@gmail.com");
+    Member *member2 = new Member("Fidelya", "fidelya@gmail.com");
 
-    Admin admin("Admin", "admin@gmail.com");
+    Admin *admin = new Admin("Admin", "admin@gmail.com");
 
-    vector<Member> members = {member1, member2};
+    vector<Member*> members = {member1, member2};
 
-    admin.showAllMember(members);
+    admin->showAllMember(members);
 
     cout << "\n=== PROFILE MEMBER 1 ===\n";
-    members[0].showProfile();
+    members[0]->showProfile();
 
     cout << "\nAdmin menonaktifkan Member 1...\n";
-    admin.toggleActivationMember(members[0]);
+    admin->toggleActivationMember(members[0]);
 
     cout << "\n=== PROFILE MEMBER 1 SETELAH DIUBAH ===\n";
-    members[0].showProfile();
+    members[0]->showProfile();
+
+    cout << endl;
+    delete member1;
+    delete member2;
+    delete admin;
 
     return 0;
 }
